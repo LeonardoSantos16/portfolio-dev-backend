@@ -22,10 +22,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      icon: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
-        allowNull: false
-      },
       link_demo: {
         type: Sequelize.STRING,
         allowNull: true
@@ -39,7 +35,8 @@ module.exports = {
         allowNull: false
       },
       updatedAt: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: true
       }
     })
   },

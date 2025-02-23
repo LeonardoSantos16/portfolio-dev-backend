@@ -3,8 +3,8 @@
     "username": "root",
     "password": null,
     "database": "my_database",
-    "host": "127.0.0.1",
-    "dialect": "sqlite"
+    "dialect": "sqlite",
+    "storage": "my_database"
   },
   "test": {
     "username": "root",

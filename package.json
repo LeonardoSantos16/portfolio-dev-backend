@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc && src/server.ts",
+    "dev": "ts-node src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "migration": "ts-node ./node_modules/.bin/sequelize-cli migration:generate --name create-repository"
   },
