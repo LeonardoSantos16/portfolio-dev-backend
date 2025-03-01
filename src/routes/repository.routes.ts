@@ -1,10 +1,13 @@
 import { Router } from "express";
 import { RepositoryController } from "../controllers/repositoryController";
-const repositoryRouter = Router()
+const repositoryRoutes = Router()
 const repositoryController = new RepositoryController()
 
-repositoryRouter.post('/', repositoryController.createRepository);
-repositoryRouter.get('/:id', repositoryController.getRepository);
-repositoryRouter.delete('/:id', repositoryController.deleteRepository);
-repositoryRouter.get('/', repositoryController.getManyRepository);
-repositoryRouter.put('/:id', repositoryController.updateRepository)
+repositoryRoutes.post('/', repositoryController.createRepository);
+repositoryRoutes.get('/:id', repositoryController.getRepository);
+repositoryRoutes.delete('/:id', repositoryController.deleteRepository);
+repositoryRoutes.get('/', repositoryController.getManyRepository);
+repositoryRoutes.put('/:id', repositoryController.updateRepository);
+
+export default repositoryRoutes;
+
