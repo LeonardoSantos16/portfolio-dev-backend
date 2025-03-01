@@ -4,15 +4,19 @@ interface PropsIconRepository{
     iconId: number,
     repositoryId: number
 }
-export async function createIconRepository ({iconId, repositoryId} : PropsIconRepository){
-    await RepositoryIcons.create({iconId, repositoryId})
-}
+export class IconsOfRepository{
 
-export async function deleteIconRepository({iconId, repositoryId} : PropsIconRepository){
-    await RepositoryIcons.destroy({where: {iconId, repositoryId}})
-}
+    async createIconRepository ({iconId, repositoryId} : PropsIconRepository){
+        await RepositoryIcons.create({iconId, repositoryId})
+    }
 
-export async function getIconRepository(repositoryId: number){
-    const iconsOfRepository = await RepositoryIcons.findAll({where: {repositoryId}}) 
-    return iconsOfRepository;
+    async deleteIconRepository({iconId, repositoryId} : PropsIconRepository){
+        await RepositoryIcons.destroy({where: {iconId, repositoryId}})
+    }
+
+    async getIconRepository(req : any, res : any){
+        const {repositoryId} = req.body;
+        const iconsOfRepositories = await RepositoryIcons.findAll({where: {repositoryId}}) 
+        return res.status(200).json(iconsOfRepositories)
+    }
 }

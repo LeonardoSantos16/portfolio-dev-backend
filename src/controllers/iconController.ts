@@ -11,18 +11,18 @@ export class IconController{
     }
 
     async deleteIcon(req : any, res : any){
-        const id = res.params;
+        const {id} = res.params;
         await Icon.destroy({where: {id}})
     }
 
     async updateIcon(req : any, res : any){
-        const nameIcon = req.body;
-        const id = req.params;
+        const {nameIcon} = req.body;
+        const {id} = req.params;
         await Icon.update({name_icon: nameIcon}, {where: {id}})
     }
 
     async getIcon(req : any, res : any){
-    const id = req.params
+    const {id} = req.params
     const icon = await Icon.findOne({where: {id}})
     return res.status(200).json(icon);
     }
