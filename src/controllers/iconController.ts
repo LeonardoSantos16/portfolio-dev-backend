@@ -12,11 +12,14 @@ export async function deleteIcon({id}: PropsIcon){
     await Icon.destroy({where: {id}})
 }
 
-export async function updateIcon({id, nameIcon} : PropsIcon){
+export async function updateIcon(req : any, res : any){
+    const nameIcon = req.body;
+    const id = req.params;
     await Icon.update({name_icon: nameIcon}, {where: {id}})
 }
 
-export async function getIcon({id} : PropsIcon){
+export async function getIcon(req : any, res : any){
+   const id = req.params
    const icon = await Icon.findOne({where: {id}})
    return icon
 }
