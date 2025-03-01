@@ -1,4 +1,4 @@
-import Repository from "../models/repository";
+import Repository from "../../models/repository";
 
 interface PropsRepository{
   id?: string
@@ -7,6 +7,7 @@ interface PropsRepository{
   description: string
   linkDemo: string
   linkGithub: string
+  idIcon: number
 }
 
 

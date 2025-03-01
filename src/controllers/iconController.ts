@@ -1,4 +1,4 @@
-import Icon from "../models/icon";
+import Icon from "../../models/icon";
 
 interface PropsIcon{
     nameIcon?: string
