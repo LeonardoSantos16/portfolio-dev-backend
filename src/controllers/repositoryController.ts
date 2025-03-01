@@ -12,31 +12,35 @@ interface PropsRepository{
 
 export class RepositoryController{
 
-   async createRepository ({title, date, description, linkDemo, linkGithub} : PropsRepository) {
-    await Repository.create({
+   async createRepository (req: any, res: any) {
+    const  {title, date, description, linkDemo, linkGithub } = req.body
+
+    const repository = await Repository.create({
         title,
         date,
         description,
         link_demo: linkDemo,
         link_github: linkGithub
-    }).then((repository: any) => {
-        console.log("Repositório criado com sucesso:", repository);
     })
-    .catch((error: any) => {
-        console.error("Erro ao criar o repositório:", error);
-    });
+
+    if(!repository){
+        return res.status(400)
+    }
+    return res.status(201).json({message: 'repositorio criado com sucesso'});
     }
 
-    async deleteRepository (id : string){
-        await Repository.destroy({
+    async deleteRepository (req : any, res : any){
+        const { id } = req.params;
+        const repositoryDeleted = await Repository.destroy({
             where: {
-                id: id
+                id
             }
-        }).then(() => {
-            console.log('Repositório deletado com sucesso')
-        }).then((error: any) => {
-            console.error("Erro ao criar o repositório:", error)
         })
+
+        if(repositoryDeleted){
+            return res.status(204).json()
+        }
+        return res.status(400).json()
     }
 
     async updateRepository (req : any, res : any){
@@ -46,28 +50,28 @@ export class RepositoryController{
         linkDemo,
         linkGithub}
         = req.body;
-        const id = req.params;
+        const { id } = req.params;
 
-        await Repository.update({
+        const repositoryUpdated = await Repository.update({
             title,
             date,
             description,
             link_demo: linkDemo,
             link_github: linkGithub
         }, {where: {
-            id: id
+            id
             }}
-        ).then((repository: any) => {
-            console.log("Repositório atualizado com sucesso:", repository);
-        })
-        .catch((error: any) => {
-            console.error("Erro ao atualizar o repositório:", error);
-        });
+        )
+        if(!repositoryUpdated){
+            return res.status(400).json();
+        }
+
+        return res.status(200).json('repositório atualizado com sucesso');
     }
 
     async getRepository(req: any, res: any){
         const {id} = req.params
-        const repository = Repository.findOne({ where: {id}})
+        const repository = await Repository.findOne({ where: {id}})
         if(!repository){
             return res.status(404).json({message: 'repositório não encontrado'})
         }
@@ -75,7 +79,7 @@ export class RepositoryController{
     }
 
     async getManyRepository (req : any, res:any){
-        const allRepositories = Repository.findAll()
+        const allRepositories = await Repository.findAll()
         if(!allRepositories){
             return res.status(404).json({message: 'repositório não encontrado'})
         }
