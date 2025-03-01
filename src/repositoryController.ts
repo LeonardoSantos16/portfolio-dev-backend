@@ -1,22 +1,22 @@
-import { where } from "sequelize";
 import Repository from "../models/repository";
 
 interface PropsRepository{
+  id?: string
   title: string
   date: Date
   description: string
-  link_demo: string
-  link_github: string
+  linkDemo: string
+  linkGithub: string
 }
 
 
-export async function createRepository ({title, date, description, link_demo, link_github} : PropsRepository) {
+export async function createRepository ({title, date, description, linkDemo, linkGithub} : PropsRepository) {
     await Repository.create({
         title,
         date,
         description,
-        link_demo,
-        link_github
+        link_demo: linkDemo,
+        link_github: linkGithub
     }).then((repository: any) => {
         console.log("Repositório criado com sucesso:", repository);
     })
@@ -37,13 +37,13 @@ export async function deleteRepository (id : string){
     })
 }
 
-export async function updateRepository ({id, title, date, description, link_demo, link_github} : PropsRepository){
+export async function updateRepository ({id, title, date, description, linkDemo, linkGithub} : PropsRepository){
     await Repository.update({
         title,
         date,
         description,
-        link_demo,
-        link_github
+        link_demo: linkDemo,
+        link_github: linkGithub
     }, {where: {
         id: id
         }}
@@ -56,9 +56,11 @@ export async function updateRepository ({id, title, date, description, link_demo
 }
 
 export async function getRepository (id: string){
-    Repository.findOne({ where: { id: id}})
+    const repository = Repository.findOne({ where: { id: id}})
+    return repository;
 }
 
-export async function getManyRepository (id: string){
-    Repository.findAll()
+export async function getManyRepository (){
+    const allRepositories = Repository.findAll()
+    return allRepositories;
 }
