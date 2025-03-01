@@ -13,6 +13,7 @@ Icon.init(
   {
     sequelize,
     modelName: 'Icon',  
+    timestamps: false,
   }
 );
 

@@ -1,34 +1,56 @@
 import Icon from "../../models/icon";
 
-interface PropsIcon{
-    nameIcon?: string
-    id?: string
-}
 export class IconController{
 
-    async createIcon({nameIcon} : PropsIcon){
-        await Icon.create({name_icon: nameIcon}).then((icon) => console.log('Icon criado com sucesso', icon)).catch((error) => console.log('erro ao criar icon', error))
+    async createIcon(req: any, res: any){
+        console.log(req.body);
+        const { name_icon } = req.body;
+        const icon = await Icon.create({name_icon})
+
+        if(!icon){
+            return res.status(400).json();
+        }
+        
+        return res.status(201).json({message: "Icon criado com sucesso"});
     }
 
     async deleteIcon(req : any, res : any){
-        const {id} = res.params;
-        await Icon.destroy({where: {id}})
+        const {id} = req.params;
+        const iconDeleted = await Icon.destroy({where: {id}});
+
+        if(!iconDeleted){
+            return res.status(400).json();
+        }
+
+        return res.status(200).json({message: "Icon deletado com sucesso"});
     }
 
     async updateIcon(req : any, res : any){
-        const {nameIcon} = req.body;
+        const {name_icon} = req.body;
         const {id} = req.params;
-        await Icon.update({name_icon: nameIcon}, {where: {id}})
+        const iconUpdated = await Icon.update({name_icon}, {where: {id}})
+
+        if(!iconUpdated){
+            return res.status(400).json();
+        }
+
+        return res.status(200).json('icon atualizado com sucesso');
     }
 
     async getIcon(req : any, res : any){
-    const {id} = req.params
-    const icon = await Icon.findOne({where: {id}})
-    return res.status(200).json(icon);
+        const {id} = req.params
+        const icon = await Icon.findOne({where: {id}})
+        if(!icon){
+            return res.status(400).json();
+        }
+        return res.status(200).json(icon);
     }
 
     async getManyIcons(req : any, res: any){
-        const icons = await Icon.findAll()
+        const icons = await Icon.findAll();
+        if(!icons){
+            return res.status(400).json();
+        }
         return res.status(200).json(icons)
     }
 }
