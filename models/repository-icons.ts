@@ -7,16 +7,19 @@ RepositoryIcons.init(
     {
         iconId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            primaryKey: true,
         },
         repositoryId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            primaryKey: true,
         },
     },
     {
         sequelize,
-        modelName: 'RepositoryIcons'
+        modelName: 'RepositoryIcons',
+        timestamps: false,
     }
 )
 export default RepositoryIcons;

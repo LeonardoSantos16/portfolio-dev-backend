@@ -1,7 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../sequelize/db'; 
 import Icon from './icon';  
-
+import RepositoryIcons from './repository-icons';
 class Repository extends Model {}
 
 Repository.init(
@@ -33,10 +33,7 @@ Repository.init(
   }
 );
 
-Repository.belongsToMany(Icon, {
-  through: 'RepositoryIcons',
-  foreignKey: 'repositoryId',
-  otherKey: 'iconId',
-});
+Repository.hasMany(RepositoryIcons, { foreignKey: 'repositoryId' });
+RepositoryIcons.belongsTo(Repository, { foreignKey: 'repositoryId' });
 
 export default Repository;
