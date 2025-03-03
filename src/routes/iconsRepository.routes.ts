@@ -6,6 +6,6 @@ const iconRepository = Router();
 
 iconRepository.get('/:id', iconsOfRepository.getIconRepository);
 iconRepository.post('/', iconsOfRepository.createIconRepository);
-iconRepository.delete('/:id', iconsOfRepository.deleteIconRepository);
+iconRepository.delete('/', iconsOfRepository.deleteIconRepository);
 
 export default iconRepository;

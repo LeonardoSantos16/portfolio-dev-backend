@@ -17,7 +17,6 @@ export class IconController{
     async deleteIcon(req : any, res : any){
         const {id} = req.params;
         const iconDeleted = await Icon.destroy({where: {id}});
-
         if(!iconDeleted){
             return res.status(400).json();
         }
