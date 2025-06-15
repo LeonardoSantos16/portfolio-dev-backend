@@ -1,7 +1,7 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../sequelize/db'; 
-import Icon from './icon';  
-import RepositoryIcons from './repository-icons';
+import { DataTypes, Model } from "sequelize";
+import sequelize from "../sequelize/db";
+import Icon from "./icon";
+import RepositoryIcons from "./repository-icons";
 class Repository extends Model {}
 
 Repository.init(
@@ -26,14 +26,28 @@ Repository.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    highlighted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
+    category: {
+      type: DataTypes.ENUM(
+        "WEB_DEVELOPMENT",
+        "MOBILE_DEVELOPMENT",
+        "BACKEND_SYSTEMS",
+        "DATA_SCIENCE",
+        "FULL_STACK"
+      ),
+      allowNull: true,
+    },
   },
   {
-    sequelize,  
-    modelName: 'Repository', 
+    sequelize,
+    modelName: "Repository",
   }
 );
 
-Repository.hasMany(RepositoryIcons, { foreignKey: 'repositoryId' });
-RepositoryIcons.belongsTo(Repository, { foreignKey: 'repositoryId' });
+Repository.hasMany(RepositoryIcons, { foreignKey: "repositoryId" });
+RepositoryIcons.belongsTo(Repository, { foreignKey: "repositoryId" });
 
 export default Repository;
