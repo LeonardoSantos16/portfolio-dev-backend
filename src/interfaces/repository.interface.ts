@@ -17,10 +17,11 @@ export interface IRepositoryAttributes {
   description: string;
   link_demo?: string;
   link_github: string;
+  date: Date;
   id_icon?: number;
   category: RepositoryCategory;
   highlighted: boolean;
-  CreatedAt: Date;
+  createdAt?: Date;
   updatedAt?: Date;
 }
 

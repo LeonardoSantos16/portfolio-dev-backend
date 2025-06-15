@@ -1,9 +1,29 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../sequelize/db";
 import Icon from "./icon";
 import RepositoryIcons from "./repository-icons";
-class Repository extends Model {}
+import { IRepositoryAttributes } from "../src/interfaces/repository.interface";
+import { RepositoryCategory } from "../src/types/enums";
 
+interface RepositoryCreationAttributes
+  extends Optional<IRepositoryAttributes, "id" | "createdAt" | "updatedAt"> {}
+
+class Repository
+  extends Model<IRepositoryAttributes, RepositoryCreationAttributes>
+  implements IRepositoryAttributes
+{
+  date!: Date;
+  id!: string;
+  title!: string;
+  description!: string;
+  link_demo?: string | undefined;
+  link_github!: string;
+  id_icon?: number | undefined;
+  category!: RepositoryCategory;
+  highlighted!: boolean;
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+}
 Repository.init(
   {
     title: {
@@ -39,6 +59,11 @@ Repository.init(
         "FULL_STACK"
       ),
       allowNull: true,
+    },
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true,
     },
   },
   {
