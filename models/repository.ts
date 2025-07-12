@@ -1,28 +1,27 @@
-import { DataTypes, Model, Optional } from "sequelize";
-import sequelize from "../sequelize/db";
-import Icon from "./icon";
-import RepositoryIcons from "./repository-icons";
-import { IRepositoryAttributes } from "../src/interfaces/repository.interface";
-import { RepositoryCategory } from "../src/types/enums";
+import { DataTypes, Model, Optional } from 'sequelize'
+import sequelize from '../sequelize/db'
+import RepositoryIcons from './repository-icons'
+import { IRepositoryAttributes } from '../src/interfaces/repository.interface'
+import { RepositoryCategory } from '../src/types/enums'
 
 interface RepositoryCreationAttributes
-  extends Optional<IRepositoryAttributes, "id" | "createdAt" | "updatedAt"> {}
+  extends Optional<IRepositoryAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
 
 class Repository
   extends Model<IRepositoryAttributes, RepositoryCreationAttributes>
   implements IRepositoryAttributes
 {
-  date!: Date;
-  id!: string;
-  title!: string;
-  description!: string;
-  link_demo?: string | undefined;
-  link_github!: string;
-  id_icon?: number | undefined;
-  category!: RepositoryCategory;
-  highlighted!: boolean;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  date!: Date
+  id!: string
+  title!: string
+  description!: string
+  link_demo?: string | undefined
+  link_github!: string
+  id_icon?: number | undefined
+  category!: RepositoryCategory
+  highlighted!: boolean
+  public readonly createdAt!: Date
+  public readonly updatedAt!: Date
 }
 Repository.init(
   {
@@ -52,11 +51,11 @@ Repository.init(
     },
     category: {
       type: DataTypes.ENUM(
-        "WEB_DEVELOPMENT",
-        "MOBILE_DEVELOPMENT",
-        "BACKEND_SYSTEMS",
-        "DATA_SCIENCE",
-        "FULL_STACK"
+        'WEB_DEVELOPMENT',
+        'MOBILE_DEVELOPMENT',
+        'BACKEND_SYSTEMS',
+        'DATA_SCIENCE',
+        'FULL_STACK'
       ),
       allowNull: true,
     },
@@ -68,11 +67,11 @@ Repository.init(
   },
   {
     sequelize,
-    modelName: "Repository",
+    modelName: 'Repository',
   }
-);
+)
 
-Repository.hasMany(RepositoryIcons, { foreignKey: "repositoryId" });
-RepositoryIcons.belongsTo(Repository, { foreignKey: "repositoryId" });
+Repository.hasMany(RepositoryIcons, { foreignKey: 'repositoryId' })
+RepositoryIcons.belongsTo(Repository, { foreignKey: 'repositoryId' })
 
-export default Repository;
+export default Repository
