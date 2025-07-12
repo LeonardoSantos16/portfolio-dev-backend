@@ -20,6 +20,7 @@ module.exports = {
       },
       startDate: {
         type: Sequelize.DATE,
+        field: 'start_date',
       },
       organization: {
         type: Sequelize.STRING,
@@ -30,6 +31,7 @@ module.exports = {
       },
       endDate: {
         type: Sequelize.DATE,
+        field: 'end_date',
       },
       mode: {
         type: Sequelize.STRING,
