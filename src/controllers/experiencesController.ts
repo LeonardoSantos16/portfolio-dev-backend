@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import Experiences from '../../models/experiences'
 import { ExperiencesCreationAttributes } from '../interfaces/experiences.interface'
 import { IUpdateRepositoryRequestBody } from '../interfaces/repository.interface'
+import { ExperiencesType } from '../types/enums'
 export class experiencesController {
   async createExperience(
     req: Request<{}, {}, ExperiencesCreationAttributes>,
@@ -92,6 +93,35 @@ export class experiencesController {
       return res
         .status(500)
         .json({ message: 'Falha ao atualizar a experiência' })
+    }
+  }
+  async getExperienceByType(
+    req: Request<{}, {}, {}, { type?: ExperiencesType }>,
+    res: Response
+  ): Promise<Response> {
+    try {
+      const type = req.query.type
+      console.log('🚀 ~ experiencesController ~ type:', type)
+      const whereCondition: { type?: ExperiencesType } = {}
+
+      if (type) {
+        whereCondition.type = type
+      }
+
+      const experiences = await Experiences.findAll({
+        where: whereCondition,
+      })
+
+      if (experiences.length === 0 && type) {
+        return res.status(404).json({
+          message: `Nenhuma experiência encontrada para o tipo: ${type}`,
+        })
+      }
+
+      return res.status(200).json(experiences)
+    } catch (error) {
+      console.error(error)
+      return res.status(500).json({ message: 'Falha ao buscar experience' })
     }
   }
 }
