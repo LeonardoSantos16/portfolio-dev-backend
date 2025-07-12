@@ -1,10 +1,13 @@
 import { Model, DataTypes } from 'sequelize'
 import sequelize from '../sequelize/db'
-import { IExperiencesAttributes } from '../src/interfaces/experiences.interface'
+import {
+  ExperiencesCreationAttributes,
+  IExperiencesAttributes,
+} from '../src/interfaces/experiences.interface'
 import { ExperiencesType } from '../src/types/enums'
 
 class Experiences
-  extends Model<IExperiencesAttributes>
+  extends Model<IExperiencesAttributes, ExperiencesCreationAttributes>
   implements IExperiencesAttributes
 {
   id!: number
@@ -66,3 +69,5 @@ Experiences.init(
     underscored: true,
   }
 )
+
+export default Experiences
