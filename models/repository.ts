@@ -15,8 +15,9 @@ class Repository
   id!: string
   title!: string
   description!: string
-  link_demo?: string | undefined
-  link_github!: string
+  linkDemo?: string | undefined
+  shortDescription?: string
+  linkGithub!: string
   id_icon?: number | undefined
   category!: RepositoryCategory
   highlighted!: boolean
@@ -37,13 +38,20 @@ Repository.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    link_demo: {
+    linkDemo: {
       type: DataTypes.STRING,
       allowNull: true,
+      field: 'link_demo',
     },
-    link_github: {
+    shortDescription: {
+      type: DataTypes.STRING(130),
+      allowNull: true,
+      field: 'short_description',
+    },
+    linkGithub: {
       type: DataTypes.STRING,
       allowNull: false,
+      field: 'link_github',
     },
     highlighted: {
       type: DataTypes.BOOLEAN,
