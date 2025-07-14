@@ -156,6 +156,7 @@ export class RepositoryController {
       const { id } = req.params
       const repository = await Repository.findOne({ where: { id } })
 
+      console.log('🚀 ~ RepositoryController ~ repository:', repository)
       if (!repository) {
         return res.status(404).json({ message: 'Repositório não encontrado.' })
       }
@@ -167,7 +168,12 @@ export class RepositoryController {
   }
 
   getManyRepository = async (
-    req: Request<{}, {}, {}, { category?: RepositoryCategory }>,
+    req: Request<
+      {},
+      {},
+      {},
+      { category?: RepositoryCategory; limit?: string; page?: string }
+    >,
     res: Response
   ): Promise<Response> => {
     try {
@@ -177,9 +183,15 @@ export class RepositoryController {
       if (category) {
         whereCondition.category = category
       }
+      const page = parseInt(req.query.page || '1', 10)
+      const limit = parseInt(req.query.limit || '6', 10)
+      const offset = (page - 1) * limit
 
       const allRepositories = await Repository.findAll({
         where: whereCondition,
+        limit: limit,
+        offset: offset,
+        order: [['date', 'DESC']],
       })
 
       if (!allRepositories) {
@@ -187,6 +199,29 @@ export class RepositoryController {
       }
 
       return res.status(200).json(allRepositories)
+    } catch (error) {
+      console.error(error)
+      return res.status(500).json({ message: 'Internal server error.' })
+    }
+  }
+  getHighlightedRepository = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    try {
+      const highlighted = await Repository.findAll({
+        where: { highlighted: true },
+      })
+      console.log(
+        '🚀 ~ RepositoryController ~ getHighlightedRepository= ~ highlighted:',
+        highlighted
+      )
+      if (!highlighted) {
+        return res
+          .status(404)
+          .json({ message: 'Repositório com highlighted não encontrado.' })
+      }
+      return res.status(200).json(highlighted)
     } catch (error) {
       console.error(error)
       return res.status(500).json({ message: 'Internal server error.' })
