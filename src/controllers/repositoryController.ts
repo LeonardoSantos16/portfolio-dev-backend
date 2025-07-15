@@ -187,18 +187,18 @@ export class RepositoryController {
       const limit = parseInt(req.query.limit || '6', 10)
       const offset = (page - 1) * limit
 
-      const allRepositories = await Repository.findAll({
+      const { count, rows } = await Repository.findAndCountAll({
         where: whereCondition,
         limit: limit,
         offset: offset,
         order: [['date', 'DESC']],
       })
 
-      if (!allRepositories) {
+      if (!rows) {
         return res.status(500).json({ message: 'Erro ao buscar repositórios.' })
       }
 
-      return res.status(200).json(allRepositories)
+      return res.status(200).json({ repository: rows, totalItems: count })
     } catch (error) {
       console.error(error)
       return res.status(500).json({ message: 'Internal server error.' })
