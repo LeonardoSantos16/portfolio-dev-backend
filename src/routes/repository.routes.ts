@@ -1,9 +1,15 @@
 import { Router } from 'express'
 import { RepositoryController } from '../controllers/repositoryController'
+import multer from 'multer'
 const repositoryRoutes = Router()
 const repositoryController = new RepositoryController()
+const upload = multer({ storage: multer.memoryStorage() })
 
-repositoryRoutes.post('/', repositoryController.createRepository)
+repositoryRoutes.post(
+  '/',
+  upload.single('image'),
+  repositoryController.createRepository
+)
 repositoryRoutes.get(
   '/highlighted',
   repositoryController.getHighlightedRepository

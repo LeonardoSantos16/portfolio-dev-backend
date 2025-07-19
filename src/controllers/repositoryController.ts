@@ -1,11 +1,14 @@
+import { PutObjectCommand } from '@aws-sdk/client-s3'
 import Repository from '../../models/repository'
+import { env } from '../env'
 import {
   ICreateRepositoryRequestBody,
   IUpdateRepositoryRequestBody,
 } from '../interfaces/repository.interface'
 import { RepositoryCategory } from '../types/enums'
 import { Request, Response } from 'express'
-
+import { r2 } from '../lib/cloudflare'
+import { randomUUID } from 'node:crypto'
 export class RepositoryController {
   createRepository = async (
     req: Request<{}, {}, ICreateRepositoryRequestBody>,
@@ -23,10 +26,14 @@ export class RepositoryController {
         highlighted,
         idIcon,
       } = req.body
-      console.log(
-        '🚀 ~ RepositoryController ~ shortDescription:',
-        shortDescription
-      )
+
+      const file = req.file
+
+      if (!file) {
+        return res.status(400).send('Nenhum arquivo enviado')
+      }
+
+      console.log('🚀 ~ RepositoryController ~ category:', category)
 
       if (!(Object.values(RepositoryCategory) as string[]).includes(category)) {
         return res.status(400).json({ message: 'Invalid category provided.' })
@@ -38,12 +45,29 @@ export class RepositoryController {
         })
       }
 
+      const fileName = `${randomUUID()}-${file.originalname}`
+
+      const commandUpload = new PutObjectCommand({
+        Bucket: 'portfolio2025',
+        Key: fileName,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      })
+
+      try {
+        await r2.send(commandUpload)
+      } catch (error) {
+        console.error('Erro no upload', error)
+        return res.status(500).send('Erro ao fazer upload do arquivo.')
+      }
+
       const repository = await Repository.create({
         title,
         date: new Date(date),
         description,
         category,
         shortDescription,
+        imageUrl: fileName,
         highlighted,
         linkDemo: linkDemo,
         linkGithub: linkGithub,
@@ -152,6 +176,7 @@ export class RepositoryController {
     req: Request<{ id: string }>,
     res: Response
   ): Promise<Response> => {
+    console.log(env.CLOUDFLARE_ENDPOINT)
     try {
       const { id } = req.params
       const repository = await Repository.findOne({ where: { id } })
