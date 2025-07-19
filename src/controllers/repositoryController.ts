@@ -1,19 +1,11 @@
-import { DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
-import Repository from '../../models/repository'
-import { env } from '../env'
-import {
-  ICreateRepositoryRequestBody,
-  IUpdateRepositoryRequestBody,
-} from '../interfaces/repository.interface'
 import { RepositoryCategory } from '../types/enums'
 import { Request, Response } from 'express'
-import { r2 } from '../lib/cloudflare'
-import { randomUUID } from 'node:crypto'
 import { RepositoryService } from '../services/RepositoryService'
+import { CreateRepositoryBody } from '../schemas/repositorySchema'
 export class RepositoryController {
   private repositoryService = new RepositoryService()
   createRepository = async (
-    req: Request<{}, {}, ICreateRepositoryRequestBody>,
+    req: Request<{}, {}, CreateRepositoryBody>,
     res: Response
   ): Promise<Response> => {
     try {
@@ -25,13 +17,6 @@ export class RepositoryController {
         return res.status(400).send('Nenhum arquivo enviado')
       }
 
-      if (
-        !(Object.values(RepositoryCategory) as string[]).includes(
-          newRepository.category
-        )
-      ) {
-        return res.status(400).json({ message: 'Tipo de categoria inválido' })
-      }
       const repository = await this.repositoryService.create(
         newRepository,
         file
