@@ -101,7 +101,6 @@ export class experiencesController {
   ): Promise<Response> {
     try {
       const type = req.query.type
-      console.log('🚀 ~ experiencesController ~ type:', type)
       const whereCondition: { type?: ExperiencesType } = {}
 
       if (type) {

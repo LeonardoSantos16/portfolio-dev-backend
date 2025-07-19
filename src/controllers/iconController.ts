@@ -23,7 +23,6 @@ export class IconController {
 
   async updateIcon(req: any, res: any) {
     const { id } = req.params
-    console.log('🚀 ~ IconController ~ updateIcon ~ req.body:', req.body)
 
     const iconUpdated = await Icon.update(req.body, { where: { id } })
 

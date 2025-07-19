@@ -1,9 +1,8 @@
 import { Router } from 'express'
 import { RepositoryController } from '../controllers/repositoryController'
-import multer from 'multer'
+import { upload } from '../middleware/uploadMiddleware'
 const repositoryRoutes = Router()
 const repositoryController = new RepositoryController()
-const upload = multer({ storage: multer.memoryStorage() })
 
 repositoryRoutes.post(
   '/',
