@@ -17,6 +17,10 @@ repositoryRoutes.get(
 repositoryRoutes.get('/:id', repositoryController.getRepository)
 repositoryRoutes.delete('/:id', repositoryController.deleteRepository)
 repositoryRoutes.get('/', repositoryController.getManyRepository)
-repositoryRoutes.put('/:id', repositoryController.updateRepository)
+repositoryRoutes.put(
+  '/:id',
+  upload.single('image'),
+  repositoryController.updateRepository
+)
 
 export default repositoryRoutes

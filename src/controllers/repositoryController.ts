@@ -1,4 +1,4 @@
-import { PutObjectCommand } from '@aws-sdk/client-s3'
+import { DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import Repository from '../../models/repository'
 import { env } from '../env'
 import {
@@ -32,8 +32,6 @@ export class RepositoryController {
       if (!file) {
         return res.status(400).send('Nenhum arquivo enviado')
       }
-
-      console.log('🚀 ~ RepositoryController ~ category:', category)
 
       if (!(Object.values(RepositoryCategory) as string[]).includes(category)) {
         return res.status(400).json({ message: 'Invalid category provided.' })
@@ -93,11 +91,27 @@ export class RepositoryController {
   ): Promise<Response> => {
     try {
       const { id } = req.params
+
+      const repository = await Repository.findByPk(id)
+
+      if (!repository) {
+        return res.status(404).json({ message: 'Repositório não encontrado.' })
+      }
+
+      const imageKey = repository.imageUrl
+
       const repositoryDeleted = await Repository.destroy({
         where: {
           id,
         },
       })
+
+      const deleteCommand = new DeleteObjectCommand({
+        Bucket: 'portfolio2025',
+        Key: imageKey,
+      })
+
+      await r2.send(deleteCommand)
 
       if (repositoryDeleted) {
         return res.status(204).send()
@@ -117,43 +131,56 @@ export class RepositoryController {
   ): Promise<Response> => {
     try {
       const { id } = req.params
-      const {
-        title,
-        date,
-        description,
-        highlighted,
-        linkDemo,
-        shortDescription,
-        category,
-        linkGithub,
-        idIcon,
-      } = req.body
+      const body = req.body
+      const newFile = req.file
+      console.log('🚀 ~ RepositoryController ~  req.body:', req.body)
+      console.log('🚀 ~ RepositoryController ~ req.file:', req.file)
 
-      if (
-        category &&
-        !(Object.values(RepositoryCategory) as string[]).includes(category)
-      ) {
-        return res.status(400).json({ message: 'Invalid category provided.' })
+      const repository = await Repository.findByPk(id)
+      if (!repository) {
+        return res.status(404).json({ message: 'Repositório não encontrado.' })
       }
 
-      const [rowsAffected] = await Repository.update(
-        {
-          title,
-          date: date ? new Date(date) : undefined,
-          description,
-          highlighted,
-          shortDescription,
-          category,
-          linkDemo,
-          linkGithub,
-          id_icon: idIcon,
-        },
-        {
-          where: {
-            id,
-          },
+      const dataToUpdate: { [key: string]: any } = {}
+
+      const fieldsToUpdate: (keyof IUpdateRepositoryRequestBody)[] = [
+        'title',
+        'date',
+        'description',
+        'highlighted',
+        'linkDemo',
+        'shortDescription',
+        'category',
+        'linkGithub',
+        'idIcon',
+      ]
+
+      fieldsToUpdate.forEach((field) => {
+        if (body[field] !== undefined) {
+          dataToUpdate[field] = body[field]
         }
-      )
+      })
+
+      const oldImageKey = repository.imageUrl
+      console.log('🚀 ~ RepositoryController ~ oldImageKey:', oldImageKey)
+
+      if (newFile) {
+        const newImageKey = `${randomUUID()}-${newFile.originalname}`
+
+        const uploadCommand = new PutObjectCommand({
+          Bucket: 'portfolio2025',
+          Key: newImageKey,
+          Body: newFile.buffer,
+          ContentType: newFile.mimetype,
+        })
+        await r2.send(uploadCommand)
+
+        dataToUpdate.imageUrl = newImageKey
+      }
+
+      const [rowsAffected] = await Repository.update(dataToUpdate, {
+        where: { id },
+      })
 
       if (rowsAffected === 0) {
         return res
@@ -161,7 +188,20 @@ export class RepositoryController {
           .json({ message: 'Repositório não encontrado para atualização.' })
       }
 
+      if (newFile && oldImageKey) {
+        const deleteCommand = new DeleteObjectCommand({
+          Bucket: 'portfolio2025',
+          Key: oldImageKey,
+        })
+        console.log(
+          '🚀 ~ RepositoryController ~ newFile && oldImageKey:',
+          newFile && oldImageKey
+        )
+
+        await r2.send(deleteCommand)
+      }
       const updatedRepository = await Repository.findByPk(id)
+
       return res.status(200).json({
         message: 'Repositório atualizado com sucesso',
         repository: updatedRepository,
@@ -176,15 +216,16 @@ export class RepositoryController {
     req: Request<{ id: string }>,
     res: Response
   ): Promise<Response> => {
-    console.log(env.CLOUDFLARE_ENDPOINT)
     try {
       const { id } = req.params
       const repository = await Repository.findOne({ where: { id } })
 
-      console.log('🚀 ~ RepositoryController ~ repository:', repository)
       if (!repository) {
         return res.status(404).json({ message: 'Repositório não encontrado.' })
       }
+      const imageUrl = repository.imageUrl
+      const imageDomainUrl = `${env.CLOUDFLARE_PUBLIC_URL}${imageUrl}`
+      repository.imageUrl = imageDomainUrl
       return res.status(200).json(repository)
     } catch (error) {
       console.error(error)
@@ -222,8 +263,17 @@ export class RepositoryController {
       if (!rows) {
         return res.status(500).json({ message: 'Erro ao buscar repositórios.' })
       }
+      const repositoriesWithFullUrl = rows.map((repositoryInstance) => {
+        const repositoryObject = repositoryInstance.toJSON()
+        return {
+          ...repositoryObject,
+          imageUrl: `${env.CLOUDFLARE_PUBLIC_URL}${repositoryObject.imageUrl}`,
+        }
+      })
 
-      return res.status(200).json({ repository: rows, totalItems: count })
+      return res
+        .status(200)
+        .json({ repository: repositoriesWithFullUrl, totalItems: count })
     } catch (error) {
       console.error(error)
       return res.status(500).json({ message: 'Internal server error.' })
@@ -237,10 +287,7 @@ export class RepositoryController {
       const highlighted = await Repository.findAll({
         where: { highlighted: true },
       })
-      console.log(
-        '🚀 ~ RepositoryController ~ getHighlightedRepository= ~ highlighted:',
-        highlighted
-      )
+
       if (!highlighted) {
         return res
           .status(404)

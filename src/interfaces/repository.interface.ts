@@ -10,6 +10,7 @@ export interface ICreateRepositoryRequestBody {
   idIcon: number
   category: RepositoryCategory
   highlighted: boolean
+  imageUrl?: string
 }
 
 export interface IRepositoryAttributes {
