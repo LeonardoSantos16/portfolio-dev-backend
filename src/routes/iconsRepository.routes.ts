@@ -1,11 +1,11 @@
-import { Router } from "express";
-import { IconsOfRepository } from "../controllers/repositoryIconsController";
+import { Router } from 'express'
+import { IconsOfRepositoryController } from '../controllers/repositoryIconsController'
 
-const iconsOfRepository = new IconsOfRepository();
-const iconRepository = Router();
+const iconsOfRepository = new IconsOfRepositoryController()
+const iconRepository = Router()
 
-iconRepository.get('/:id', iconsOfRepository.getIconRepository);
-iconRepository.post('/', iconsOfRepository.createIconRepository);
-iconRepository.delete('/', iconsOfRepository.deleteIconRepository);
+iconRepository.get('/:id', iconsOfRepository.getIconRepository)
+iconRepository.post('/', iconsOfRepository.createIconRepository)
+iconRepository.delete('/', iconsOfRepository.deleteIconRepository)
 
-export default iconRepository;
+export default iconRepository
