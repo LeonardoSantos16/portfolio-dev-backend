@@ -20,6 +20,7 @@ class Repository
   linkGithub!: string
   id_icon?: number | undefined
   category!: RepositoryCategory
+  imageUrl?: string
   highlighted!: boolean
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
@@ -55,6 +56,11 @@ Repository.init(
     },
     highlighted: {
       type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
+    imageUrl: {
+      type: DataTypes.STRING,
+      field: 'image_url',
       allowNull: true,
     },
     category: {

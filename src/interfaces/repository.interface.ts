@@ -25,6 +25,7 @@ export interface IRepositoryAttributes {
   highlighted: boolean
   createdAt?: Date
   updatedAt?: Date
+  imageUrl?: string
 }
 
 // TODO: estudar o tipo Partial
