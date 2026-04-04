@@ -1,26 +1,26 @@
-import { Model, DataTypes } from 'sequelize'
-import sequelize from '../sequelize/db'
+import { Model, DataTypes } from "sequelize";
+import sequelize from "../sequelize/db";
 import {
   ExperiencesCreationAttributes,
   IExperiencesAttributes,
-} from '../src/interfaces/experiences.interface'
-import { ExperiencesType } from '../src/types/enums'
+} from "../src/interfaces/experiences.interface";
+import { ExperiencesType } from "../src/types/enums";
 
 class Experiences
   extends Model<IExperiencesAttributes, ExperiencesCreationAttributes>
   implements IExperiencesAttributes
 {
-  id!: number
-  title!: string
-  description!: string
-  startDate!: Date
-  organization!: string
-  location!: string
-  endDate!: Date
-  mode!: string
-  type!: ExperiencesType
-  public readonly createdAt!: Date
-  public readonly updatedAt!: Date
+  id!: number;
+  title!: string;
+  description!: string;
+  startDate!: Date;
+  organization!: string;
+  location!: string;
+  endDate!: Date;
+  mode!: string;
+  type!: ExperiencesType;
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 }
 
 Experiences.init(
@@ -32,7 +32,7 @@ Experiences.init(
       allowNull: false,
     },
     type: {
-      type: DataTypes.ENUM('WORK', 'EDUCATION'),
+      type: DataTypes.ENUM("WORK", "EDUCATION"),
       allowNull: false,
     },
     title: {
@@ -63,11 +63,11 @@ Experiences.init(
   },
   {
     sequelize,
-    modelName: 'Experiences',
-    tableName: 'Experiences',
+    modelName: "Experiences",
+    tableName: "experiences",
     timestamps: true,
     underscored: true,
-  }
-)
+  },
+);
 
-export default Experiences
+export default Experiences;

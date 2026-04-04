@@ -1,12 +1,12 @@
-import { DataTypes, Model } from 'sequelize'
-import sequelize from '../sequelize/db'
-import RepositoryIcons from './repository-icons'
+import { DataTypes, Model } from "sequelize";
+import sequelize from "../sequelize/db";
+import RepositoryIcons from "./repository-icons";
 
 class Icon extends Model {}
 
 Icon.init(
   {
-    name_icon: {
+    nameIcon: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -19,15 +19,16 @@ Icon.init(
       allowNull: true,
     },
   },
-
   {
     sequelize,
-    modelName: 'Icon',
+    modelName: "Icon",
+    tableName: "icons",
+    underscored: true,
     timestamps: false,
-  }
-)
+  },
+);
 
-Icon.hasMany(RepositoryIcons, { foreignKey: 'iconId' })
-RepositoryIcons.belongsTo(Icon, { foreignKey: 'iconId' })
+Icon.hasMany(RepositoryIcons, { foreignKey: "iconId" });
+RepositoryIcons.belongsTo(Icon, { foreignKey: "iconId" });
 
-export default Icon
+export default Icon;

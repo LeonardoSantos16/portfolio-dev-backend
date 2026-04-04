@@ -1,15 +1,30 @@
-import 'dotenv/config'
-import express from 'express'
-import routes from './routes'
-import cors from 'cors'
+import "dotenv/config";
+import express from "express";
+import routes from "./routes";
+import cors from "cors";
+import sequelize from "../sequelize/db";
+import "../models/experiences";
+import "../models/repository";
+import "../models/icon";
+import "../models/repository-icons";
 
-const app = express()
-const port = 3000
+const app = express();
+const port = 3000;
 
-app.use(cors())
-app.use(express.json())
-app.use(routes)
+app.use(cors());
+app.use(express.json());
+app.use(routes);
 
-app.listen(port, () => {
-  console.log(`app listening on port ${port}`)
-})
+async function startServer() {
+  try {
+    await sequelize.sync({ alter: true });
+
+    app.listen(port, () => {
+      console.log(`app listening on port ${port}`);
+    });
+  } catch (error) {
+    console.error("Unable to connect to the database:", error);
+  }
+}
+
+startServer();

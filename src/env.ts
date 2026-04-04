@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 const envSchema = z.object({
   CLOUDFLARE_ENDPOINT: z.string().url(),
@@ -6,6 +6,7 @@ const envSchema = z.object({
   CLOUDFLARE_SECRET_KEY: z.string(),
   CLOUDFLARE_PUBLIC_URL: z.string(),
   CLOUDFLARE_BUCKET_NAME: z.string(),
-})
+  DATABASE_URL: z.string(),
+});
 
-export const env = envSchema.parse(process.env)
+export const env = envSchema.parse(process.env);

@@ -1,25 +1,28 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../sequelize/db';
+import { DataTypes, Model } from "sequelize";
+import sequelize from "../sequelize/db";
 
 class RepositoryIcons extends Model {}
 
 RepositoryIcons.init(
-    {
-        iconId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            primaryKey: true,
-        },
-        repositoryId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            primaryKey: true,
-        },
+  {
+    iconId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
     },
-    {
-        sequelize,
-        modelName: 'RepositoryIcons',
-        timestamps: false,
-    }
-)
+    repositoryId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+    },
+  },
+  {
+    sequelize,
+    modelName: "RepositoryIcons",
+    tableName: "repository_icons",
+    underscored: true,
+    timestamps: false,
+  },
+);
+
 export default RepositoryIcons;

@@ -1,33 +1,34 @@
-import { RepositoryCategory } from '../types/enums'
+import { RepositoryCategory } from "../types/enums";
 
 export interface ICreateRepositoryRequestBody {
-  title: string
-  date: string
-  description: string
-  linkDemo?: string
-  linkGithub: string
-  shortDescription?: string
-  idIcon: number
-  category: RepositoryCategory
-  highlighted: boolean
-  imageUrl?: string
+  title: string;
+  date: string;
+  description: string;
+  linkDemo?: string;
+  linkGithub: string;
+  shortDescription?: string;
+  idIcon: number;
+  category: RepositoryCategory;
+  highlighted: boolean;
+  imageUrl?: string;
 }
 
 export interface IRepositoryAttributes {
-  id: string
-  title: string
-  description: string
-  linkDemo?: string
-  linkGithub: string
-  shortDescription?: string
-  date: Date
-  id_icon?: number
-  category: RepositoryCategory
-  highlighted: boolean
-  createdAt?: Date
-  updatedAt?: Date
-  imageUrl?: string
+  id: number;
+  title: string;
+  description: string;
+  date: Date;
+  linkDemo?: string;
+  shortDescription?: string;
+  linkGithub: string;
+  id_icon?: number;
+  category: RepositoryCategory;
+  imageUrl?: string;
+  highlighted: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 // TODO: estudar o tipo Partial
-export type IUpdateRepositoryRequestBody = Partial<ICreateRepositoryRequestBody>
+export type IUpdateRepositoryRequestBody =
+  Partial<ICreateRepositoryRequestBody>;

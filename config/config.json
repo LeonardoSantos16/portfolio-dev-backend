@@ -4,7 +4,7 @@
     "password": null,
     "database": "my_database",
     "dialect": "sqlite",
-    "storage": "my_database"
+    "storage": "my_database.sqlite"
   },
   "test": {
     "username": "root",
@@ -14,10 +14,13 @@
     "dialect": "sqlite"
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "prod_database",
-    "host": "127.0.0.1",
-    "dialect": "sqlite"
+    "use_env_variable": "DATABASE_URL",
+    "dialect": "postgres",
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
   }
 }
