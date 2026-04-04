@@ -3,7 +3,7 @@
     "username": "root",
     "password": null,
     "database": "my_database",
-    "dialect": "sqlite",
+    "dialect": "postgres",
     "storage": "my_database.sqlite"
   },
   "test": {
@@ -11,7 +11,7 @@
     "password": "dad",
     "database": "test_database",
     "host": "127.0.0.1",
-    "dialect": "sqlite"
+    "dialect": "postgres"
   },
   "production": {
     "use_env_variable": "DATABASE_URL",
