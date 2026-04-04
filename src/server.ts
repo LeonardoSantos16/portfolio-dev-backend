@@ -17,10 +17,8 @@ app.use(routes);
 
 async function startServer() {
   try {
-    await sequelize.sync({ force: true });
-
-    app.listen(port, () => {
-      console.log(`app listening on port ${port}`);
+    sequelize.sync().then(() => {
+      app.listen(3000, () => console.log("Local server running"));
     });
   } catch (error) {
     console.error("Unable to connect to the database:", error);
