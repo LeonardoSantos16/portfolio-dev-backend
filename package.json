@@ -7,7 +7,7 @@
     "dev": "ts-node src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "migration": "ts-node ./node_modules/.bin/sequelize-cli migration:generate --name create-repository",
-    "build": "npx tsc && NODE_ENV=production npx sequelize-cli db:migrate",
+    "build": "npx tsc",
     "start": "node dist/index.js"
   },
   "keywords": [],

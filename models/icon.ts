@@ -6,6 +6,11 @@ class Icon extends Model {}
 
 Icon.init(
   {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     nameIcon: {
       type: DataTypes.STRING,
       allowNull: false,
