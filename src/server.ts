@@ -1,28 +1,23 @@
 import "dotenv/config";
+import "pg";
 import express from "express";
 import routes from "./routes";
 import cors from "cors";
 import sequelize from "../sequelize/db";
-import "../models/experiences";
-import "../models/repository";
-import "../models/icon";
-import "../models/repository-icons";
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 app.use(routes);
 
-async function startServer() {
-  try {
-    sequelize.sync().then(() => {
-      app.listen(3000, () => console.log("Local server running"));
+if (process.env.NODE_ENV !== "production") {
+  sequelize.sync({ alter: true }).then(() => {
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
     });
-  } catch (error) {
-    console.error("Unable to connect to the database:", error);
-  }
+  });
 }
 
-startServer();
+export default app;
