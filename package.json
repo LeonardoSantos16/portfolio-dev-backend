@@ -5,19 +5,24 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node src/server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
     "migration": "ts-node ./node_modules/.bin/sequelize-cli migration:generate --name create-repository",
     "build": "npx tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test:watch": "vitest",
+    "hash-password": "ts-node scripts/hash-password.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.848.0",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^4.21.2",
+    "express-rate-limit": "^8.7.4",
+    "jsonwebtoken": "^9.0.3",
     "multer": "^2.0.2",
     "pg": "^8.20.0",
     "pg-hstore": "^2.3.4",
@@ -27,11 +32,15 @@
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.23",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
+    "@types/supertest": "^7.2.1",
     "sequelize-cli": "^6.6.2",
+    "supertest": "^7.3.2",
     "ts-node": "^10.9.2",
     "tsconfig": "^7.0.0",
     "tsx": "^4.19.3",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^5.1.0"
   }
 }
