@@ -9,6 +9,8 @@ API REST desenvolvida para gerenciar dinamicamente as informações do meu portf
 * **ORM:** Sequelize (PostgreSQL / SQLite)
 * **Validação:** Zod
 * **Upload:** Multer + AWS SDK (Cloudflare R2)
+* **Autenticação:** JWT (jsonwebtoken, HS256) + bcryptjs + express-rate-limit
+* **Testes:** Vitest + Supertest
 * **Serviços:** Cors, Dotenv
 
 ## Arquitetura e Decisões de Projeto
@@ -25,6 +27,17 @@ API REST desenvolvida para gerenciar dinamicamente as informações do meu portf
 * `POST /upload`: Endpoint especializado para gestão de imagens via Cloudflare.
 * `GET /icons`: Gerenciamento de ícones de tecnologias e habilidades.
 
+## Autenticação
+
+As rotas de leitura (GET) são públicas. Todas as rotas de escrita (POST/PUT/DELETE) exigem
+`Authorization: Bearer <token>`, obtido em:
+
+* `POST /auth/login` com `{ "email", "password" }` → `{ "token", "expiresIn" }`
+  (limitado a 5 tentativas a cada 15 min por IP)
+
+Há um único administrador, definido por variáveis de ambiente. Spec completa em
+`openspec/changes/add-jwt-auth/`.
+
 ## Instalação e Execução
 
 1. **Clone o repositório:**
@@ -35,10 +48,17 @@ API REST desenvolvida para gerenciar dinamicamente as informações do meu portf
    ```bash
    npm install
 3. Configure o .env:
-  Crie um arquivo .env na raiz com as credenciais do Banco de Dados e as chaves de acesso ao Cloudflare (CLOUDFLARE_ACCESS_KEY, CLOUDFLARE_SECRET_KEY, etc).
+  Crie um arquivo .env na raiz com as credenciais do Banco de Dados, as chaves de acesso ao Cloudflare (CLOUDFLARE_ACCESS_KEY, CLOUDFLARE_SECRET_KEY, etc) e as variáveis de autenticação:
+   * `JWT_SECRET`: mínimo de 32 caracteres. Gere com `node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"`
+   * `JWT_EXPIRES_IN`: opcional, padrão `1h`
+   * `ADMIN_EMAIL`
+   * `ADMIN_PASSWORD_HASH`: saída de `npm run hash-password` (a senha é digitada sem eco)
+
+   Todas são validadas na inicialização: sem elas a API não sobe. Configure-as na Vercel **antes** do deploy.
 4. Rode as migrations
    ```bash
    npx sequelize-cli db:migrate
 5. Inicie em modo de desenvolvimento:  npm run dev
+6. Rode os testes: npm test
 
 Desenvolvido por Leonardo Mendes
