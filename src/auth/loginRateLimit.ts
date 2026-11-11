@@ -5,6 +5,8 @@ import { rateLimit } from 'express-rate-limit'
 export const loginRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 5,
+  // Só tentativas que falham (status >= 400) contam para o limite.
+  skipSuccessfulRequests: true,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: { message: 'Muitas tentativas de login. Tente novamente mais tarde.' },

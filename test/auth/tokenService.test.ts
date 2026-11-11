@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import jwt from 'jsonwebtoken'
 import { createTokenService } from '../../src/auth/tokenService'
+import { expiredToken } from '../helpers/tokens'
 
 const SECRET = 'x'.repeat(40)
 
@@ -27,11 +28,7 @@ describe('tokenService', () => {
 
   it('rejeita token expirado', () => {
     const tokens = createTokenService({ secret: SECRET, expiresIn: '1h' })
-    const expired = jwt.sign(
-      { exp: Math.floor(Date.now() / 1000) - 60 },
-      SECRET,
-      { algorithm: 'HS256', subject: 'admin', issuer: 'portfolio-api', audience: 'portfolio-admin' }
-    )
+    const expired = expiredToken(SECRET)
 
     expect(tokens.verify(expired)).toBeNull()
   })
@@ -74,6 +71,22 @@ describe('tokenService', () => {
 
     expect(tokens.verify(unsigned)).toBeNull()
   })
+
+  it.each([{ subject: 'outro-usuario' }, {}])(
+    'rejeita token cujo sub não é admin: %o',
+    (subjectOption) => {
+      const tokens = createTokenService({ secret: SECRET, expiresIn: '1h' })
+      const foreign = jwt.sign({}, SECRET, {
+        algorithm: 'HS256',
+        issuer: 'portfolio-api',
+        audience: 'portfolio-admin',
+        expiresIn: '1h',
+        ...subjectOption,
+      })
+
+      expect(tokens.verify(foreign)).toBeNull()
+    }
+  )
 
   it.each([
     { issuer: 'outro-emissor', audience: 'portfolio-admin' },

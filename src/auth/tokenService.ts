@@ -2,6 +2,7 @@ import jwt, { SignOptions } from 'jsonwebtoken'
 
 const ISSUER = 'portfolio-api'
 const AUDIENCE = 'portfolio-admin'
+const SUBJECT = 'admin'
 
 interface TokenServiceConfig {
   secret: string
@@ -13,7 +14,7 @@ export function createTokenService({ secret, expiresIn }: TokenServiceConfig) {
     sign(): string {
       return jwt.sign({}, secret, {
         algorithm: 'HS256',
-        subject: 'admin',
+        subject: SUBJECT,
         issuer: ISSUER,
         audience: AUDIENCE,
         expiresIn: expiresIn as SignOptions['expiresIn'],
@@ -26,8 +27,9 @@ export function createTokenService({ secret, expiresIn }: TokenServiceConfig) {
           algorithms: ['HS256'],
           issuer: ISSUER,
           audience: AUDIENCE,
-        }) as jwt.JwtPayload
-        return { sub: payload.sub as string }
+          subject: SUBJECT,
+        }) as jwt.JwtPayload & { sub: string }
+        return { sub: payload.sub }
       } catch {
         return null
       }

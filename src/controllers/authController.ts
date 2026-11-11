@@ -20,7 +20,7 @@ export class AuthController {
         return res.status(401).json({ message: error.message })
       }
       console.error(error)
-      return res.status(500).json({ message: 'Internal server error.' })
+      return res.status(500).json({ message: 'Falha ao realizar o login.' })
     }
   }
 }

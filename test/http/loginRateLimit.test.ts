@@ -1,21 +1,5 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import request from 'supertest'
-
-vi.mock('../../models/icon', async () => ({
-  default: (await import('../helpers/boundaries')).fakeModel(),
-}))
-vi.mock('../../models/repository', async () => ({
-  default: (await import('../helpers/boundaries')).fakeModel(),
-}))
-vi.mock('../../models/repository-icons', async () => ({
-  default: (await import('../helpers/boundaries')).fakeModel(),
-}))
-vi.mock('../../models/experiences', async () => ({
-  default: (await import('../helpers/boundaries')).fakeModel(),
-}))
-vi.mock('../../src/utils/R2Storage', async () => ({
-  R2Storage: (await import('../helpers/boundaries')).FakeR2Storage,
-}))
 
 import app from '../../src/app'
 import { TEST_ADMIN_EMAIL, TEST_ADMIN_PASSWORD } from '../setup-env'
@@ -41,6 +25,13 @@ describe('rate limit do POST /auth/login', () => {
     expect(sixth.status).toBe(429)
     expect(typeof sixth.body.message).toBe('string')
     expect(sixth.body.token).toBeUndefined()
+  })
+
+  it('não conta logins bem-sucedidos (o admin não se bloqueia sozinho)', async () => {
+    const ADMIN_IP = '192.0.2.50'
+    for (let i = 0; i < 6; i++) {
+      expect((await loginFrom(ADMIN_IP, TEST_ADMIN_PASSWORD)).status).toBe(200)
+    }
   })
 
   it('não afeta outro IP', async () => {

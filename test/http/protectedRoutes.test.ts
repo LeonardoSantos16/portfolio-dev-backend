@@ -1,26 +1,10 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import request from 'supertest'
 
-vi.mock('../../models/icon', async () => ({
-  default: (await import('../helpers/boundaries')).fakeModel(),
-}))
-vi.mock('../../models/repository', async () => ({
-  default: (await import('../helpers/boundaries')).fakeModel(),
-}))
-vi.mock('../../models/repository-icons', async () => ({
-  default: (await import('../helpers/boundaries')).fakeModel(),
-}))
-vi.mock('../../models/experiences', async () => ({
-  default: (await import('../helpers/boundaries')).fakeModel(),
-}))
-vi.mock('../../src/utils/R2Storage', async () => ({
-  R2Storage: (await import('../helpers/boundaries')).FakeR2Storage,
-}))
-
-import jwt from 'jsonwebtoken'
 import app from '../../src/app'
 import { createTokenService } from '../../src/auth/tokenService'
 import { TEST_JWT_SECRET } from '../setup-env'
+import { expiredToken } from '../helpers/tokens'
 
 function tokenSignedWith(secret: string) {
   return createTokenService({ secret, expiresIn: '1h' }).sign()
@@ -28,15 +12,6 @@ function tokenSignedWith(secret: string) {
 
 function validToken() {
   return tokenSignedWith(TEST_JWT_SECRET)
-}
-
-function expiredToken() {
-  return jwt.sign({ exp: Math.floor(Date.now() / 1000) - 60 }, TEST_JWT_SECRET, {
-    algorithm: 'HS256',
-    subject: 'admin',
-    issuer: 'portfolio-api',
-    audience: 'portfolio-admin',
-  })
 }
 
 describe('rotas de escrita protegidas', () => {
@@ -53,7 +28,7 @@ describe('rotas de escrita protegidas', () => {
     ['token sem esquema', validToken()],
     ['Bearer com token inválido', 'Bearer isto-nao-e-um-jwt'],
     ['Bearer com outro segredo', `Bearer ${tokenSignedWith('y'.repeat(40))}`],
-    ['Bearer com token expirado', `Bearer ${expiredToken()}`],
+    ['Bearer com token expirado', `Bearer ${expiredToken(TEST_JWT_SECRET)}`],
   ])('POST /icon com %s responde 401 genérico', async (_caso, authorization) => {
     const res = await request(app)
       .post('/icon')
