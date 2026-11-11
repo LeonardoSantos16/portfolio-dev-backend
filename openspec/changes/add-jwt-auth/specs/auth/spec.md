@@ -27,17 +27,27 @@ credenciais correspondem a `ADMIN_EMAIL` e `ADMIN_PASSWORD_HASH`, responde 200 c
 
 #### Scenario: Corpo inválido
 - **WHEN** o corpo não contém `email` válido ou `password` não vazio
-- **THEN** a resposta é 400 com `{ "message": string }`
+- **THEN** a resposta é 400 com `{ "message": string }` em português
 - **AND** nenhuma verificação de senha é executada
 
 ### Requirement: Login Rate Limiting
-O sistema SHALL limitar `POST /auth/login` a 5 requisições por janela de 15 minutos por
-endereço IP do cliente (considerando o proxy confiável da Vercel).
+O sistema SHALL limitar `POST /auth/login` a 5 tentativas malsucedidas por janela de 15
+minutos por endereço IP do cliente. Logins bem-sucedidos MUST NOT contar para o limite.
+O IP SHALL ser obtido do `X-Forwarded-For` somente quando a aplicação roda na Vercel
+(`VERCEL` definido); nos demais ambientes, o IP da conexão é usado.
 
 #### Scenario: Limite excedido
-- **WHEN** o mesmo IP faz a 6ª requisição de login dentro de 15 minutos
+- **WHEN** o mesmo IP faz uma requisição de login após 5 tentativas malsucedidas dentro de 15 minutos
 - **THEN** a resposta é 429 com `{ "message": string }`
-- **AND** as credenciais não são avaliadas
+- **AND** as credenciais não são avaliadas, mesmo que estejam corretas
+
+#### Scenario: Logins bem-sucedidos não bloqueiam
+- **WHEN** o admin faz 6 logins válidos seguidos a partir do mesmo IP
+- **THEN** todos respondem 200
+
+#### Scenario: X-Forwarded-For forjado fora da Vercel
+- **WHEN** a aplicação roda fora da Vercel e um cliente varia o `X-Forwarded-For` a cada tentativa
+- **THEN** as tentativas são contadas pelo IP real da conexão e a 6ª responde 429
 
 #### Scenario: Rate limit isolado ao login
 - **WHEN** um IP excede o limite do login
@@ -57,7 +67,7 @@ senha ou hash.
 
 ### Requirement: Token Verification
 O sistema SHALL aceitar um token somente se a assinatura for válida com `JWT_SECRET`, o
-algoritmo for HS256, `iss` e `aud` corresponderem aos valores esperados e o token não
+algoritmo for HS256, `sub`, `iss` e `aud` corresponderem aos valores esperados e o token não
 estiver expirado.
 
 #### Scenario: Token válido
@@ -74,6 +84,10 @@ estiver expirado.
 
 #### Scenario: Algoritmo `none` ou diferente de HS256
 - **WHEN** um token com `alg: "none"` ou outro algoritmo é verificado
+- **THEN** a verificação falha
+
+#### Scenario: Subject diferente de admin
+- **WHEN** um token assinado corretamente tem `sub` diferente de `"admin"` ou não tem `sub`
 - **THEN** a verificação falha
 
 #### Scenario: Issuer ou audience incorretos
@@ -125,7 +139,12 @@ O sistema SHALL manter todas as rotas GET acessíveis sem autenticação.
 ### Requirement: Auth Configuration
 O sistema SHALL validar na inicialização (`src/env.ts`) que `JWT_SECRET` tem no mínimo
 32 caracteres, `ADMIN_EMAIL` é um e-mail válido e `ADMIN_PASSWORD_HASH` é um hash bcrypt;
-`JWT_EXPIRES_IN` é opcional com padrão `1h`.
+`JWT_EXPIRES_IN` é opcional com padrão `1h` e, quando definido, MUST ser um inteiro positivo
+seguido de unidade `s`, `m`, `h` ou `d`.
+
+#### Scenario: Expiração sem unidade
+- **WHEN** a aplicação inicia com `JWT_EXPIRES_IN=3600` (ou qualquer valor fora do formato)
+- **THEN** a validação de ambiente falha com erro
 
 #### Scenario: Segredo curto
 - **WHEN** a aplicação inicia com `JWT_SECRET` de menos de 32 caracteres

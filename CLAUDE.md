@@ -61,19 +61,22 @@ Camadas (Controller → Service → Model), sem injeção de dependência:
 
 - Admin único; credenciais em env (`ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`). Sem tabela de usuários.
 - `POST /auth/login` → JWT HS256 (`sub: admin`, `iss: portfolio-api`, `aud: portfolio-admin`),
-  validade `JWT_EXPIRES_IN`. Sem refresh token. Rate limit: 5 tentativas / 15 min por IP.
+  validade `JWT_EXPIRES_IN` (sempre com unidade: `30m`, `1h`, `1d`). Sem refresh token.
+  Rate limit: 5 tentativas **malsucedidas** / 15 min por IP.
 - `requireAuth` (`src/auth/authMiddleware.ts`) protege **todas** as rotas POST/PUT/DELETE.
   Ao criar uma rota de escrita nova, aplique `requireAuth` e inclua-a na lista `writeRoutes`
   de `test/http/protectedRoutes.test.ts`. Em rotas com upload, `requireAuth` vem antes do multer.
-- GETs são públicos. `app.set('trust proxy', 1)` é necessário para o rate limit enxergar o IP real.
+- GETs são públicos. `trust proxy` só é ligado quando `VERCEL` está definido (a Vercel define
+  automaticamente); fora dela, o `X-Forwarded-For` é do cliente e não é confiável.
 - Spec (OpenSpec): `openspec/changes/add-jwt-auth/`.
 - `cors()` ainda sem restrição de origem (trabalho futuro).
 
 ## Testes
 
 - `src/app.ts` monta o app sem efeitos colaterais; `src/server.ts` faz sync + listen. Testes importam `app.ts`.
-- `test/setup-env.ts` define as env vars de teste (inclui credenciais de admin conhecidas).
-- Mocks só nas fronteiras: models Sequelize e `R2Storage` (`test/helpers/boundaries.ts`).
+- `test/setup-env.ts` define as env vars de teste (credenciais de admin conhecidas e `VERCEL=1`).
+- Mocks só nas fronteiras: models Sequelize e `R2Storage`, registrados uma única vez em
+  `test/setup-boundaries.ts` (dublês em `test/helpers/boundaries.ts`). Model novo → adicione lá.
   Não mockar services nem controllers.
 - Requisições de login em teste devem usar `X-Forwarded-For` distintos para não esbarrar no rate limit.
 - Fluxo de trabalho: spec OpenSpec → TDD (skill `tdd`), uma fatia vertical por vez.

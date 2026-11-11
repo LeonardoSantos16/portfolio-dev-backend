@@ -31,7 +31,9 @@ ou suíte de testes.
 | D8 | 401 genérico (`Não autorizado.`) + `WWW-Authenticate: Bearer`; sem 403 | Mensagens distintas por motivo | Não dar pistas ao atacante; papel único |
 | D9 | Login com mensagem única `Credenciais inválidas.`; `bcrypt.compare` executado mesmo com e-mail errado (contra hash dummy) | Retorno antecipado | Evitar enumeração por mensagem e por tempo |
 | D10 | Comparação do e-mail case-insensitive após `trim` | Comparação exata | Usabilidade, sem impacto de segurança |
-| D11 | `express-rate-limit` em memória, 5 req / 15 min por IP no `/auth/login`; `app.set('trust proxy', 1)` | Upstash Redis | Sem nova infra; bcrypt custo 12 já encarece força bruta |
+| D11 | `express-rate-limit` em memória, 5 **falhas** / 15 min por IP no `/auth/login` (`skipSuccessfulRequests`); `app.set('trust proxy', 1)` **somente quando `VERCEL` está definido** | Upstash Redis; contar todas as requisições; `trust proxy` sempre ligado | Sem nova infra; bcrypt custo 12 já encarece força bruta. Logins bem-sucedidos não bloqueiam o admin. Fora da Vercel o `X-Forwarded-For` é controlado pelo cliente e permitiria burlar o limite (achado da revisão) |
+| D15 | `JWT_EXPIRES_IN` validado com `/^[1-9]\d*[smhd]$/` | Aceitar qualquer string | O `jsonwebtoken` lê `"3600"` como milissegundos (token de 3 s) e lança erro com valores inválidos (achado da revisão) |
+| D16 | `verify` exige `sub: 'admin'` | Ignorar `sub` | Torna a claim efetiva e impede reuso de tokens com outro propósito (achado da revisão) |
 | D12 | `authMiddleware` antes de `upload.single('image')` | Depois | Rejeitar não autenticados antes de bufferizar até 5 MB |
 | D13 | Extrair `src/app.ts` de `src/server.ts` | Mockar `sequelize.sync` | Testabilidade sem efeitos colaterais; Vercel continua usando `server.ts` |
 | D14 | Vitest + Supertest; `vi.mock` para services/db/R2 | Jest | TS nativo, mocks de módulo simples |
