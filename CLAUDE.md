@@ -13,7 +13,8 @@ Deploy na Vercel (`vercel.json` aponta tudo para `src/server.ts`, que exporta o 
 
 - `npm run dev` — sobe o servidor com `ts-node src/server.ts` (porta `PORT` ou 3000)
 - `npm run build` — `tsc`
-- `npm test` — **ainda não configurado** (não há framework de testes no projeto)
+- `npm test` — Vitest (`test/**/*.test.ts`); `npm run test:watch` para modo watch
+- `npm run hash-password` — gera o `ADMIN_PASSWORD_HASH` (bcrypt, custo 12)
 
 ## Arquitetura
 
@@ -44,7 +45,9 @@ Camadas (Controller → Service → Model), sem injeção de dependência:
 ## Variáveis de ambiente (`.env`, não versionado)
 
 `DATABASE_URL`, `CLOUDFLARE_ENDPOINT`, `CLOUDFLARE_ACCESS_KEY`, `CLOUDFLARE_SECRET_KEY`,
-`CLOUDFLARE_PUBLIC_URL`, `CLOUDFLARE_BUCKET_NAME`, `PORT` (opcional), `NODE_ENV`.
+`CLOUDFLARE_PUBLIC_URL`, `CLOUDFLARE_BUCKET_NAME`, `JWT_SECRET` (≥ 32 chars),
+`JWT_EXPIRES_IN` (opcional, padrão `1h`), `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH` (bcrypt),
+`PORT` (opcional), `NODE_ENV`.
 
 ## Convenções
 
@@ -54,19 +57,23 @@ Camadas (Controller → Service → Model), sem injeção de dependência:
   (alguns arquivos usam aspas duplas — siga o estilo do arquivo editado)
 - Respostas de erro no formato `{ message: string }`
 
-## Estado atual de segurança
+## Autenticação
 
-- **Não há autenticação nem autorização**: todas as rotas de escrita
-  (POST/PUT/DELETE) estão públicas.
-- `cors()` sem restrição de origem.
+- Admin único; credenciais em env (`ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`). Sem tabela de usuários.
+- `POST /auth/login` → JWT HS256 (`sub: admin`, `iss: portfolio-api`, `aud: portfolio-admin`),
+  validade `JWT_EXPIRES_IN`. Sem refresh token. Rate limit: 5 tentativas / 15 min por IP.
+- `requireAuth` (`src/auth/authMiddleware.ts`) protege **todas** as rotas POST/PUT/DELETE.
+  Ao criar uma rota de escrita nova, aplique `requireAuth` e inclua-a na lista `writeRoutes`
+  de `test/http/protectedRoutes.test.ts`. Em rotas com upload, `requireAuth` vem antes do multer.
+- GETs são públicos. `app.set('trust proxy', 1)` é necessário para o rate limit enxergar o IP real.
+- Spec (OpenSpec): `openspec/changes/add-jwt-auth/`.
+- `cors()` ainda sem restrição de origem (trabalho futuro).
 
-## Pontos de atenção para testes
+## Testes
 
-- Importar `src/server.ts`, `src/env.ts` ou qualquer model dispara efeitos colaterais
-  (conexão com o banco, validação de env, cliente S3). Testes precisam definir env vars
-  ou mockar esses módulos antes do import.
-
-## Workflow em andamento
-
-Implementação de autenticação JWT: requisitos via skill `grill-me` → spec de segurança no
-formato OpenSpec (SDD) → implementação com a skill `tdd` (red → green → refactor).
+- `src/app.ts` monta o app sem efeitos colaterais; `src/server.ts` faz sync + listen. Testes importam `app.ts`.
+- `test/setup-env.ts` define as env vars de teste (inclui credenciais de admin conhecidas).
+- Mocks só nas fronteiras: models Sequelize e `R2Storage` (`test/helpers/boundaries.ts`).
+  Não mockar services nem controllers.
+- Requisições de login em teste devem usar `X-Forwarded-For` distintos para não esbarrar no rate limit.
+- Fluxo de trabalho: spec OpenSpec → TDD (skill `tdd`), uma fatia vertical por vez.
