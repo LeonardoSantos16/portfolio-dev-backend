@@ -8,7 +8,11 @@ export const envSchema = z.object({
   CLOUDFLARE_BUCKET_NAME: z.string(),
   DATABASE_URL: z.string(),
   JWT_SECRET: z.string().min(32),
-  JWT_EXPIRES_IN: z.string().default("1h"),
+  // Sempre com unidade: o jsonwebtoken lê "3600" como milissegundos.
+  JWT_EXPIRES_IN: z
+    .string()
+    .regex(/^[1-9]\d*[smhd]$/, "Use um número com unidade: s, m, h ou d (ex.: 1h)")
+    .default("1h"),
   ADMIN_EMAIL: z.string().email(),
   ADMIN_PASSWORD_HASH: z
     .string()

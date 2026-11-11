@@ -37,6 +37,21 @@ describe('envSchema', () => {
     expect(result.data?.JWT_EXPIRES_IN).toBe('1h')
   })
 
+  it.each(['3600', 'abc', '', '1 hora', '-1h'])(
+    'rejeita JWT_EXPIRES_IN sem unidade ou inválido: "%s"',
+    (expiresIn) => {
+      const result = envSchema.safeParse({ ...validEnv, JWT_EXPIRES_IN: expiresIn })
+
+      expect(result.success).toBe(false)
+    }
+  )
+
+  it.each(['30m', '1h', '2h', '1d', '900s'])('aceita JWT_EXPIRES_IN "%s"', (expiresIn) => {
+    const result = envSchema.safeParse({ ...validEnv, JWT_EXPIRES_IN: expiresIn })
+
+    expect(result.success).toBe(true)
+  })
+
   it.each([undefined, 'nao-e-email'])('rejeita ADMIN_EMAIL inválido: %s', (email) => {
     const result = envSchema.safeParse({ ...validEnv, ADMIN_EMAIL: email })
 
